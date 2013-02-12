@@ -32,6 +32,7 @@ public class MainActivity extends Activity implements SensorEventListener {
   	SensorManager sm;
   	TextView acceleration;
   	TextView time;
+  	float x, y, z;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,10 +65,11 @@ public class MainActivity extends Activity implements SensorEventListener {
             @Override
             public void onClick(View v) {
                 showCurrentLocation();
-            	int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+            	int hour = Calendar.getInstance().get(Calendar.HOUR);
             	int minute = Calendar.getInstance().get(Calendar.MINUTE);
             	int second = Calendar.getInstance().get(Calendar.SECOND);
             	time.setText(Integer.toString(hour) + " | " + Integer.toString(minute) + " | " + Integer.toString(second));
+            	acceleration.setText("X: " + x + "\nY: " + y + "\nZ: " + z);
             }
     });        
         
@@ -80,13 +82,12 @@ public class MainActivity extends Activity implements SensorEventListener {
         if (location != null) {
 
             String message = String.format(
-                    "Current Location \n Longitude: %1$s \n Latitude: %2$s \n Bearing: %2$s",
+                    "Current Location \n Longitude: %1$s \n Latitude: %2$s \n Bearing: %3$s",
                     location.getLongitude(), location.getLatitude(), location.getBearing()
             );
             displayView.setText(message);
             
-            Toast.makeText(MainActivity.this, message,
-                    Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
         }
 
     }   
@@ -95,10 +96,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         public void onLocationChanged(Location location) {
             String message = String.format(
-                    "New Location \n Longitude: %1$s \n Latitude: %2$s",
-                    location.getLongitude(), location.getLatitude()
+                    "New Location \n Longitude: %1$s \n Latitude: %2$s \n Bearing: %3$s",
+                    location.getLongitude(), location.getLatitude(), location.getBearing()
             );
-            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
         }
 
         public void onStatusChanged(String s, int i, Bundle b) {
@@ -122,10 +123,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     
     //accelerometer
     public void onSensorChanged(SensorEvent event) {
- 	   acceleration.setText("X: " + event.values[0] + 
- 						    "\nY: " + event.values[1] +
- 						    "\nZ: " + event.values[2]);
-
+ 	   //acceleration.setText("X: " + event.values[0] + "\nY: " + event.values[1] + "\nZ: " + event.values[2]);
+ 	   x = event.values[0];
+ 	   y = event.values[1];
+ 	   z = event.values[2];
     }
 
 	@Override

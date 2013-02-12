@@ -1,5 +1,9 @@
 package com.example.servicetest3;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Calendar;
 
 import android.hardware.Sensor;
@@ -10,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
@@ -23,7 +28,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 0; // in Meters
     private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
     
-    protected LocationManager locationManager;    
+    protected LocationManager locationManager;  
+  	String Long, Latt, Bear;
+  	
     protected Button retrieveLocationButton;
     protected TextView displayView;
     
@@ -70,11 +77,21 @@ public class MainActivity extends Activity implements SensorEventListener {
             	int second = Calendar.getInstance().get(Calendar.SECOND);
             	time.setText(Integer.toString(hour) + " | " + Integer.toString(minute) + " | " + Integer.toString(second));
             	acceleration.setText("X: " + x + "\nY: " + y + "\nZ: " + z);
+            	sendDataToSD("<PACKET><type></type><hour>"+hour+"</hour><minute>"+minute+"</minute><second>"+second+"</second><pressure_1></pressure_1>" +
+            			"<temperature_1></temperature_1><humidity_1></humidity_1><solarirradiace_1></solarirradiace_1>" +
+            			"<uvradiation_1></uvradiation_1><pressure_2></pressure_2><temperature_2></temperature_2>" +
+            			"<humidity_2></humidity_2><solarirradiace_2></solarirradiace_2><uvradiation_2></uvradiation_2>" +
+            			"<latitude>"+Latt+"</latitude><longitude>"+Long+"</longitude><accelerometer_x>"+x+"</accelerometer_x><accelerometer_y>"+y+"</accelerometer_y>" +
+            			"<accelerometer_z>"+z+"</accelerometer_z><gyro_x></gyro_x><gyro_y></gyro_y><gyro_z></gyro_z><bearing>"+Bear+"</bearing></PACKET>");
             }
-    });        
+    }); //end onClick() listener 
         
-    }    
-
+    } //end onCreate()
+    
+    public void setLong(String l) { Long = l; }
+    public void setLatt(String l) { Latt = l; }
+    public void setBear(String b) { Bear = b; }
+    
     protected void showCurrentLocation() {
 
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -85,6 +102,12 @@ public class MainActivity extends Activity implements SensorEventListener {
                     "Current Location \n Longitude: %1$s \n Latitude: %2$s \n Bearing: %3$s",
                     location.getLongitude(), location.getLatitude(), location.getBearing()
             );
+            Long = Double.toString(location.getLongitude());
+            setLong(Long);
+            Latt = Double.toString(location.getLatitude());
+            setLatt(Latt);
+            Bear = Float.toString(location.getBearing());
+            setBear(Bear);
             displayView.setText(message);
             
             //Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
@@ -96,7 +119,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         public void onLocationChanged(Location location) {
             String message = String.format(
-                    "New Location \n Longitude: %1$s \n Latitude: %2$s \n Bearing: %3$s",
+            		"New Location \n Longitude: %1$s \n Latitude: %2$s \n Bearing: %3$s",
                     location.getLongitude(), location.getLatitude(), location.getBearing()
             );
             //Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
@@ -134,6 +157,25 @@ public class MainActivity extends Activity implements SensorEventListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void sendDataToSD(String data) {
+	    String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd/uoflsli/";
+		String fname = "data2.txt";
+		String extState = Environment.getExternalStorageState();
+		if (extState.equals(Environment.MEDIA_MOUNTED))
+	    {
+	        try {
+	        	System.out.println('1');
+	        	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(path + fname, true))); //the true enables append	        	
+	        	out.println(data);
+	        	System.out.println('2');
+	            out.close();
+
+	        } catch (IOException ioe) {
+	            ioe.printStackTrace();
+	          }
+	    }
+   }
 
     
 }

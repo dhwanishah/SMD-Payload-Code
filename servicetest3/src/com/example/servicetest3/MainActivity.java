@@ -1,46 +1,43 @@
 package com.example.servicetest3;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Calendar;
 
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class MainActivity extends Activity implements SensorEventListener {
+public class MainActivity extends Activity { /***implements SensorEventListener {***/
 
-	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 0; // in Meters
-    private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
+	/**private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 0; // in Meters
+    private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds**/
     
-    protected LocationManager locationManager;  
+    public final static String GPS_GO = "usli.smd.payload.GPS_GO";
+    public final static String ACCELEROMETER_GO = "usli.smd.payload.ACCELEROMETER_GO";
+    public final static String TELEPHONY_GO = "usli.smd.payload.TELEPHONY_GO";
+    
+    
+    /**protected LocationManager locationManager;**/
   	String Long, Latt, Bear;
   	
     protected Button retrieveLocationButton;
     protected TextView displayView;
     
   //accelerometer vars
-  	Sensor accelerometer;
+  	/***Sensor accelerometer;
   	SensorManager sm;
-  	TextView acceleration;
+  	TextView acceleration;***/
   	TextView time;
-  	float x, y, z;
+  	/***float x, y, z;***/
     
+  //telephony vars
+  	/****TextView SignalStrengthandBitRateErr;
+  	TelephonyManager Tel;
+  	MyPhoneStateListener MyListener;****/
+  	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         
@@ -50,45 +47,71 @@ public class MainActivity extends Activity implements SensorEventListener {
         retrieveLocationButton = (Button) findViewById(R.id.retrieve_location_button);
         displayView = (TextView) findViewById(R.id.displayView);
         
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        /**locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 
                 MINIMUM_TIME_BETWEEN_UPDATES, 
                 MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
                 new MyLocationListener()
-        );
+        );**/
         
         //time
         time = (TextView) findViewById(R.id.time);
         		
 		//set up Accelerometer service and its corresponding textViews
-		acceleration = (TextView) findViewById(R.id.acceleration);
+		/***acceleration = (TextView) findViewById(R.id.acceleration);
 		sm = (SensorManager) getSystemService(SENSOR_SERVICE);
 		accelerometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		sm.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		sm.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);***/
         
+		//set up Telephony service and its corresponding textViews to get strength and any errors
+		/****SignalStrengthandBitRateErr = (TextView) findViewById(R.id.signal);
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);****/
+		
     retrieveLocationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showCurrentLocation();
+                //showCurrentLocation();
             	int hour = Calendar.getInstance().get(Calendar.HOUR);
             	int minute = Calendar.getInstance().get(Calendar.MINUTE);
             	int second = Calendar.getInstance().get(Calendar.SECOND);
+            	
+            	Intent gpsIntent = new Intent(getApplicationContext(), GPSMonitor.class);
+            	gpsIntent.putExtra(GPS_GO, "GPS_INTENT_GO");
+            	startService(gpsIntent);
+            	
+            	Intent accelerometerIntent = new Intent(getApplicationContext(), AccelerometerMonitor.class);
+            	accelerometerIntent.putExtra(ACCELEROMETER_GO, "ACCELEROMETER_INTENT_GO");
+            	startService(accelerometerIntent);
+            	
+            	Intent TelephonyIntent = new Intent(getApplicationContext(), TelephonyMonitor.class);
+            	TelephonyIntent.putExtra(ACCELEROMETER_GO, "TELEPHONY_INTENT_GO");
+            	startService(TelephonyIntent);
+            	
             	time.setText(Integer.toString(hour) + " | " + Integer.toString(minute) + " | " + Integer.toString(second));
-            	acceleration.setText("X: " + x + "\nY: " + y + "\nZ: " + z);
-            	sendDataToSD("<PACKET><type></type><hour>"+hour+"</hour><minute>"+minute+"</minute><second>"+second+"</second><pressure_1></pressure_1>" +
-            			"<temperature_1></temperature_1><humidity_1></humidity_1><solarirradiace_1></solarirradiace_1>" +
-            			"<uvradiation_1></uvradiation_1><pressure_2></pressure_2><temperature_2></temperature_2>" +
-            			"<humidity_2></humidity_2><solarirradiace_2></solarirradiace_2><uvradiation_2></uvradiation_2>" +
-            			"<latitude>"+Latt+"</latitude><longitude>"+Long+"</longitude><accelerometer_x>"+x+"</accelerometer_x><accelerometer_y>"+y+"</accelerometer_y>" +
-            			"<accelerometer_z>"+z+"</accelerometer_z><gyro_x></gyro_x><gyro_y></gyro_y><gyro_z></gyro_z><bearing>"+Bear+"</bearing></PACKET>");
+            	
+            	/*Intent i2 = getIntent();
+            	String data_message = i2.getStringExtra(MainActivity.TIME_EXTRA_MSG);
+            	time.setText(data_message);
+            	stopService(timeIntent);*/
+            	
+            	
+            	/***acceleration.setText("X: " + x + "\nY: " + y + "\nZ: " + z);***/
+            	//sendDataToSD("<PACKET><type></type><hour>"+hour+"</hour><minute>"+minute+"</minute><second>"+second+"</second><pressure_1></pressure_1>" +
+            	//		"<temperature_1></temperature_1><humidity_1></humidity_1><solarirradiace_1></solarirradiace_1>" +
+            	//		"<uvradiation_1></uvradiation_1><pressure_2></pressure_2><temperature_2></temperature_2>" +
+            	//		"<humidity_2></humidity_2><solarirradiace_2></solarirradiace_2><uvradiation_2></uvradiation_2>" +
+            	//		"<latitude>"+Latt+"</latitude><longitude>"+Long+"</longitude><accelerometer_x>"+x+"</accelerometer_x><accelerometer_y>"+y+"</accelerometer_y>" +
+            	//		"<accelerometer_z>"+z+"</accelerometer_z><gyro_x></gyro_x><gyro_y></gyro_y><gyro_z></gyro_z><bearing>"+Bear+"</bearing></PACKET>");
             }
     }); //end onClick() listener 
         
     } //end onCreate()
     
-    public void setLong(String l) { Long = l; }
+    /**public void setLong(String l) { Long = l; }
     public void setLatt(String l) { Latt = l; }
     public void setBear(String b) { Bear = b; }
     
@@ -142,10 +165,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                     Toast.LENGTH_LONG).show();
         }
 
-    }
+    }**/
     
     //accelerometer
-    public void onSensorChanged(SensorEvent event) {
+    /***public void onSensorChanged(SensorEvent event) {
  	   //acceleration.setText("X: " + event.values[0] + "\nY: " + event.values[1] + "\nZ: " + event.values[2]);
  	   x = event.values[0];
  	   y = event.values[1];
@@ -156,9 +179,25 @@ public class MainActivity extends Activity implements SensorEventListener {
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 		
-	}
+	}***/
 	
-	public void sendDataToSD(String data) {
+	
+	/* Start the class for signal strength and bit err */
+	/****class MyPhoneStateListener extends PhoneStateListener {****/
+	      /* Get the Signal strength from the provider, each time there is an update */
+	      /****@Override
+	      public void onSignalStrengthsChanged(SignalStrength signalStrength)
+	      {
+	         super.onSignalStrengthsChanged(signalStrength);
+	         //copy to SD (uncomment to copy straight to sd)
+	         //sendDataToSD("<SStren>" + Integer.toString(signalStrength.getGsmSignalStrength()) + "</SStren><BErr>" + Integer.toString(signalStrength.getGsmBitErrorRate()) + "</BErr>");
+	         //SignalStrengthandBitRateErr.setText(Integer.toString(signalStrength.getGsmSignalStrength()) + " | " + Integer.toString(signalStrength.getGsmBitErrorRate()));
+	      }
+
+	 };****/
+	 /* end the class for signal strength and bit err */
+	
+	/*public void sendDataToSD(String data) {
 	    String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd/uoflsli/";
 		String fname = "data2.txt";
 		String extState = Environment.getExternalStorageState();
@@ -175,7 +214,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 	            ioe.printStackTrace();
 	          }
 	    }
-   }
+    }*/
 
     
 }

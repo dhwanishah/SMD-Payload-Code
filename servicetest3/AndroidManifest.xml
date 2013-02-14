@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:enabled="true" android:name=".GPSMonitor" />
+        <service android:enabled="true" android:name=".DataAggregator" />
+        <service android:enabled="true" android:name=".AccelerometerMonitor" />
+        <service android:enabled="true" android:name=".TelephonyMonitor" />
     </application>
 
 </manifest>

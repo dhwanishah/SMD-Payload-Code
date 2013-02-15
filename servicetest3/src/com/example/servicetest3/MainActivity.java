@@ -4,17 +4,22 @@ import java.util.Calendar;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity { /***implements SensorEventListener {***/
 
 	/**private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 0; // in Meters
     private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds**/
     
+	public final static String TIME_DATA = "usli.smd.payload.TIME_DATA";
     public final static String GPS_GO = "usli.smd.payload.GPS_GO";
     public final static String ACCELEROMETER_GO = "usli.smd.payload.ACCELEROMETER_GO";
     public final static String TELEPHONY_GO = "usli.smd.payload.TELEPHONY_GO";
@@ -73,25 +78,32 @@ public class MainActivity extends Activity { /***implements SensorEventListener 
 		
     retrieveLocationButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {            	
+            	
                 //showCurrentLocation();
-            	int hour = Calendar.getInstance().get(Calendar.HOUR);
-            	int minute = Calendar.getInstance().get(Calendar.MINUTE);
-            	int second = Calendar.getInstance().get(Calendar.SECOND);
+            	String hour = Integer.toString(Calendar.getInstance().get(Calendar.HOUR));
+            	String minute = Integer.toString(Calendar.getInstance().get(Calendar.MINUTE));
+            	String second = Integer.toString(Calendar.getInstance().get(Calendar.SECOND));
+            	time.setText(hour + " | " + minute + " | " + second);
+            	/*Intent timeIntent = new Intent(getApplicationContext(), DataAggregator.class);
+            	timeIntent.putExtra(TIME_DATA, hour + " | " + minute + " | " + second);
+            	startService(timeIntent);*/
+
+				Intent gpsIntent = new Intent(getApplicationContext(), GPSMonitor.class);
+				gpsIntent.putExtra(GPS_GO, "GPS_INTENT_GO");
+				startService(gpsIntent);
+
+				
+				Intent accelerometerIntent = new Intent(getApplicationContext(), AccelerometerMonitor.class);
+				accelerometerIntent.putExtra(ACCELEROMETER_GO, "ACCELEROMETER_INTENT_GO");
+				startService(accelerometerIntent);
+
             	
-            	Intent gpsIntent = new Intent(getApplicationContext(), GPSMonitor.class);
-            	gpsIntent.putExtra(GPS_GO, "GPS_INTENT_GO");
-            	startService(gpsIntent);
             	
-            	Intent accelerometerIntent = new Intent(getApplicationContext(), AccelerometerMonitor.class);
-            	accelerometerIntent.putExtra(ACCELEROMETER_GO, "ACCELEROMETER_INTENT_GO");
-            	startService(accelerometerIntent);
-            	
-            	Intent TelephonyIntent = new Intent(getApplicationContext(), TelephonyMonitor.class);
+            	/*Intent TelephonyIntent = new Intent(getApplicationContext(), TelephonyMonitor.class);
             	TelephonyIntent.putExtra(ACCELEROMETER_GO, "TELEPHONY_INTENT_GO");
-            	startService(TelephonyIntent);
+            	startService(TelephonyIntent);*/
             	
-            	time.setText(Integer.toString(hour) + " | " + Integer.toString(minute) + " | " + Integer.toString(second));
             	
             	/*Intent i2 = getIntent();
             	String data_message = i2.getStringExtra(MainActivity.TIME_EXTRA_MSG);

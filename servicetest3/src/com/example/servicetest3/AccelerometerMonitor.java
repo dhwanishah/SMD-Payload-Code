@@ -7,6 +7,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.widget.Toast;
 
 public class AccelerometerMonitor extends Service implements SensorEventListener {
 	
@@ -18,7 +19,8 @@ public class AccelerometerMonitor extends Service implements SensorEventListener
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
+		//Toast.makeText(this, "ACCL.onStart()", Toast.LENGTH_LONG).show();
+		
 		//set up Accelerometer service and its corresponding textViews
 		sm = (SensorManager) getSystemService(SENSOR_SERVICE);
 		accelerometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -27,7 +29,7 @@ public class AccelerometerMonitor extends Service implements SensorEventListener
 		String message = intent.getStringExtra(MainActivity.ACCELEROMETER_GO); //grab intent from MainActivity
 		if (message.equals("ACCELEROMETER_INTENT_GO")) {
 			Intent accelerometerDataSendIntent = new Intent(getApplicationContext(), DataAggregator.class);
-			accelerometerDataSendIntent.putExtra(ACCELEROMETER_DATA, " - " + x + " - " + y + " - " + z);
+			accelerometerDataSendIntent.putExtra(ACCELEROMETER_DATA, " | " + x + " | " + y + " | " + z);
         	startService(accelerometerDataSendIntent);
 		}
 		

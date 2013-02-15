@@ -34,6 +34,8 @@ public class GPSMonitor extends Service {
 		
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		//Toast.makeText(this, "GPS.onStart()", Toast.LENGTH_LONG).show();
+		
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);        
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 
@@ -51,7 +53,7 @@ public class GPSMonitor extends Service {
     	//stopSelf();
 
 		//return super.onStartCommand(intent, flags, startId);
-		return START_REDELIVER_INTENT;
+		return START_STICKY;
 	}
 	
 	public void setLong(String l) { Long = l; }

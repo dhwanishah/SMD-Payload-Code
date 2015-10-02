@@ -1,0 +1,1 @@
+Final code for the android app which connected with the GPRS system which fed it live data from an arduino controller. This data was then parsed and updated in real time on the rivercityrocketry.org website
